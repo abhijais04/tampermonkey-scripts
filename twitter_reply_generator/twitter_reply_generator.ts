@@ -185,7 +185,7 @@
             return;
         }
 
-        let generateResponsePromise = callLocalAPI("You are an expert twitter user. You need to generate a reply for the given tweet in sarcastic comeback with contradicting viewpoint style. Do not generate any additional text , just the response which I can copy and paste in twitter. Do not add hashtags in the reply. The tweet is " + tweetText);
+        let generateResponsePromise = callLocalAPI("You are an expert twitter user. You need to generate a reply for the given tweet in sarcastic comeback with contradicting viewpoint style. Do not generate any additional text, just the response which I can copy and paste in twitter. Your reply should be less than 140 characters. Do not add hashtags in the reply. The tweet is " + tweetText);
 
         generateResponsePromise
             .then(responseText => {
