@@ -9,4 +9,4 @@ Currently, this will only work on a laptop, which has ollama running locally. I 
 2. Run `llama3.2:latest` or any other model on your local laptop by using `ollama serve`.
 3. If you're not using ollama, or changing the model you're running, then update the script accordingly.
 4. Install Greasemonkey, or [TamperMonkey](https://www.tampermonkey.net/) as an extension for your browsre.
-5. Just copy paste this script as a new script in TamperMonkey. That's it. You're ready to go.
+5. Paste the content of `twitter_reply_generator.user.js` as a new script in TamperMonkey. That's it. You're ready to go.
