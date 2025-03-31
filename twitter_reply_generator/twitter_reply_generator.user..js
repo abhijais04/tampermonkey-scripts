@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name        Button Adder
-// @namespace   abhijais04
+// @name        Twitter Reply Generator
+// @namespace   https://github.com/abhijais04/tampermonkey-scripts/
 // @version     0.2
-// @description Adds a button to X.com to generate tweet replies using a local API.
-// @author      Abhishek
+// @description Adds a button to X.com to generate tweet replies using a locally hosted LLM.
+// @author      abhijais04
 // @match       https://x.com/*
 // @grant       GM_xmlhttpRequest
 // @grant       GM_addStyle
@@ -234,7 +234,7 @@
     // Create the button element
     const newButton = document.createElement('button');
     newButton.className = 'gen-reply-button';
-    newButton.textContent = 'Generate Reply';
+    newButton.textContent = 'Reply with AI';
     newButton.appendChild(dropdownContent); // Append dropdown content to the button
 
     // Function to display error message
