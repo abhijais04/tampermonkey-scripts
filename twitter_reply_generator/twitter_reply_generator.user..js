@@ -13,7 +13,7 @@
     'use strict';
 
     // Helper function for making API calls
-    const callLocalAPI = function callLocalAPI(prompt) {
+    const callLLM = function callLLM(prompt) {
         return new Promise((resolve, reject) => {
             GM_xmlhttpRequest({
                 method: 'POST',
@@ -111,13 +111,48 @@
             box-shadow: none;
             border: none;
             transition: background-color 0.3s ease;
-            z-index: 1000; /* Ensure button is above other elements */
+            z-index: 1000;
+            display: inline-block;
         }
         .gen-reply-button:hover {
             background-color: #D0D0D0; /* Slightly darker on hover */
         }
         .gen-reply-button:active {
             background-color: #C0C0C0; /* Slightly darker on click */
+        }
+
+        /* Dropdown Styling */
+        .gen-reply-button .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            z-index: 1;
+            border-radius: 5px;
+            top: 100%;
+            left: 0;
+            right: auto;
+            margin-top: 2px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+
+        .gen-reply-button:hover .dropdown-content {
+            display: block;
+        }
+
+        .gen-reply-button .dropdown-content a {
+            color: #000;
+            padding: 8px 10px;
+            text-decoration: none;
+            display: block;
+            border-radius: 3px;
+        }
+
+        .gen-reply-button .dropdown-content a:hover {
+            background-color: #ddd;
         }
 
         /* Error message styling */
@@ -151,16 +186,56 @@
             to { opacity: 1; transform: translateX(-50%) translateY(10px); }
         }
         @keyframes slideOut {
-            from { opacity: 1; transform: translateX(-50%) translateY(10px); }
+            from { opacity: 1; transform: translateX(-50%) translateY(-50px); }
             to { opacity: 0; transform: translateX(-50%) translateY(-50px); }
         }
 
     `);
 
+    const replyOptions = [
+        {
+            'name': 'Disagree with data',
+            'tone': 'opposing backed up by data and facts'
+        },
+        {
+            'name': 'Condescending',
+            'tone': 'condescending with high degree of offense, but backed by facts'
+        },
+        {
+            'name': 'Rage bait',
+            'tone': 'such that it enrages people reading it. Make the tone highly offensive.'
+        },
+        {
+            'name': 'Supportive',
+            'tone': 'supportive and encouraging'
+        },
+        {
+            'name': 'Support with data',
+            'tone': 'Supporting and backed-up by data'
+        },
+
+    ]
+
+    let dropdownContent = document.createElement('div');
+    dropdownContent.className = 'dropdown-content';
+
+    for (let index = 0; index < replyOptions.length; index++) {
+        const replyOptionContent = replyOptions[index];
+        let replyOption = document.createElement('a');
+        replyOption.textContent = replyOptionContent.name;
+        replyOption.dataset.tone = replyOptionContent.tone;
+        dropdownContent.appendChild(replyOption);
+        replyOption.addEventListener('click', function () {
+            const tone = this.dataset.tone;  // 'this' refers to the clicked 'a' element.
+            generateReply(tone); // Call generateReply with the tone
+        });
+    }
+
     // Create the button element
     const newButton = document.createElement('button');
     newButton.className = 'gen-reply-button';
     newButton.textContent = 'Generate Reply';
+    newButton.appendChild(dropdownContent); // Append dropdown content to the button
 
     // Function to display error message
     function displayErrorMessage(message) {
@@ -177,15 +252,23 @@
         document.body.appendChild(errorPopup);
     }
 
-    // Add event listener to the button
-    newButton.addEventListener('click', function() {
+    function generateReply(tone) {
         const tweetText = extractTweetText();
         if (!tweetText) {
             displayErrorMessage("Failed to extract tweet text. Please ensure the tweet is fully loaded.");
             return;
         }
 
-        let generateResponsePromise = callLocalAPI("You are an expert twitter user. You need to generate a reply for the given tweet in sarcastic comeback with contradicting viewpoint style. Do not generate any additional text, just the response which I can copy and paste in twitter. Your reply should be less than 140 characters. Do not add hashtags in the reply. The tweet is " + tweetText);
+        console.log("tone is " + tone);
+
+        let replyTone = tone ? tone : 'Opposing viewpoint with sarcasm';
+
+        let prompt = `You are an expert twitter user. You need to generate a reply for the given tweet in ${replyTone}.`
+                        + `Do not generate any additional text, just the response which I can copy and paste in twitter.`
+                        + `Your reply should be less than 140 characters. Do not add hashtags in the reply.`
+                        + `The tweet is ` + tweetText;
+
+        let generateResponsePromise = callLLM(prompt);
 
         generateResponsePromise
             .then(responseText => {
@@ -199,7 +282,7 @@
                 console.error("Error calling local API:", error);
                 displayErrorMessage("Error generating reply: " + error.message);
             });
-    });
+        }
 
     // Append the button to the document body
     document.body.appendChild(newButton);
