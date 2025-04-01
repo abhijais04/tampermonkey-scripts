@@ -344,7 +344,7 @@
                  // Re-enable button and restore text regardless of success or failure
                  newButton.textContent = 'Reply with AI ✨';
                  newButton.disabled = false;
-                 newButton.appendChild(dropdownContent); 
+                 newButton.appendChild(dropdownContent);
             });
         }
 
