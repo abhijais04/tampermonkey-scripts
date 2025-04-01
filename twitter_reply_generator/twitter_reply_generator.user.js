@@ -9,6 +9,44 @@
 // @grant       GM_addStyle
 // ==/UserScript==
 
+function makeButtonMovable() {
+    let isDragging = false;
+    let startX, startY;
+    const button = document.querySelector('.gen-reply-button');
+
+    button.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.clientX - button.offsetLeft;
+        startY = e.clientY - button.offsetTop;
+        button.style.cursor = 'grabbing';
+        e.preventDefault(); // Prevent text selection
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        let x = e.clientX - startX;
+        let y = e.clientY - startY;
+        x = Math.max(0, x);
+        y = Math.max(0, y);
+        x = Math.min(window.innerWidth - button.offsetWidth, x);
+        y = Math.min(window.innerHeight - button.offsetHeight, y);
+
+        button.style.left = x + 'px';
+        button.style.top = y + 'px';
+        e.preventDefault();
+    });
+
+    const resetDragging = () => {
+        isDragging = false;
+        button.style.cursor = 'pointer';
+    };
+
+    button.addEventListener('mouseup', resetDragging);
+    document.addEventListener('mouseleave', resetDragging);
+    button.addEventListener('dragstart', (e) => e.preventDefault());
+}
+
+
 (function() {
     'use strict';
 
@@ -119,6 +157,7 @@
             transform: translateY(-50%);
             padding: 12px 24px; /* Slightly larger padding */
             font-size: 15px;
+            font-type: Chirp;
             cursor: pointer;
             border-radius: 30px; /* More rounded corners */
             font-weight: bold;
@@ -169,8 +208,9 @@
             top: 100%; /* Position below the button */
             left: 0;
             right: auto;
-            margin-top: 5px; /* Small gap */
+            margin-top: 1px; /* Small gap */
             border: 1px solid #ddd; /* Light border */
+            font-type: Chirp;
             /* Transition for gradual appearance */
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
@@ -350,4 +390,5 @@
 
     // Append the button (with its dropdown) to the document body
     document.body.appendChild(newButton);
+    makeButtonMovable();
 })();
